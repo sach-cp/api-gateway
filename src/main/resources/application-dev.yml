@@ -4,7 +4,7 @@ spring:
 
   data:
     mongodb:
-      uri: mongodb://localhost:27017/gateway
+      uri: ${MONGO_URI}
 
   cloud:
     gateway:
@@ -21,3 +21,6 @@ spring:
           uri: http://localhost:8082
           predicates:
             - Path=/api/v1/bookings/**
+
+server:
+  port: ${PORT:8080}
