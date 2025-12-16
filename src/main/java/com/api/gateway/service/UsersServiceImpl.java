@@ -47,6 +47,7 @@ public class UsersServiceImpl implements UsersService {
                 .build();
         user.setPassword(passwordEncoder.encode(userSignupRequest.getPassword())); // Encrypt password before saving
         Mono<User> savedUser = userRepository.save(user);
+        log.info("User signed up: {}", user.getUsername());
         return savedUser.map(usr -> "User " + usr.getFullName() + " signed up successfully");
     }
 
