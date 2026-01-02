@@ -22,3 +22,9 @@ cors:
   allowed-origins:
     - http://localhost:4200
     - https://sach-cp.github.io
+
+# JWT configs
+security:
+  jwt:
+    secret-key: YuizCKebQrK8OXhBTEeKOAaTQFY1xIeNtlDfygjA/Ko=
+    expiration-time: 3600000
