@@ -1,37 +1,44 @@
 package com.api.gateway.config;
 
+import lombok.NoArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
+import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.reactive.CorsWebFilter;
-import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
-
-import java.util.Arrays;
-import java.util.List;
+import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
+import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
 
 @Configuration
 @EnableWebFluxSecurity
+@NoArgsConstructor
 public class SecurityConfig {
 
-    private final JWTAuthenticationManager authenticationManager;
-
-    public SecurityConfig(JWTAuthenticationManager authenticationManager) {
-        this.authenticationManager = authenticationManager;
-    }
-
     @Bean
-    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
+    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http,
+                                                         AuthenticationWebFilter jwtAuthenticationWebFilter) {
         return http.csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .authorizeExchange(exchange -> exchange
+                .authorizeExchange(exchanges -> exchanges
                         .pathMatchers("/api/v1/users/login", "/api/v1/users/signup").permitAll()
                         .pathMatchers(HttpMethod.OPTIONS).permitAll()
                         .anyExchange().authenticated())
-                .authenticationManager(authenticationManager)
+                .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
+                .addFilterAt(jwtAuthenticationWebFilter, SecurityWebFiltersOrder.AUTHENTICATION)
+                .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
+                .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
                 .build();
+    }
+
+
+    @Bean
+    public AuthenticationWebFilter jwtAuthenticationWebFilter(JWTAuthenticationManager authManager,
+                                                              JwtServerAuthenticationConverter converter) {
+        AuthenticationWebFilter filter = new AuthenticationWebFilter(authManager);
+        filter.setServerAuthenticationConverter(converter);
+        return filter;
     }
 
 }

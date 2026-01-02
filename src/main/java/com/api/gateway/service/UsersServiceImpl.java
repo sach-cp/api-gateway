@@ -8,9 +8,13 @@ import com.api.gateway.response.UserLoginResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+
+import java.util.HashMap;
 
 
 @Slf4j
@@ -29,7 +33,7 @@ public class UsersServiceImpl implements UsersService {
 
         return userMono.flatMap(user -> {
                     if (passwordEncoder.matches(authRequest.getPassword(), user.getPassword())) {
-                        String token = jwtService.generateToken(authRequest.getUsername());
+                        String token = this.jwtService.generateToken(new HashMap<>(), user);
                         return Mono.just(new UserLoginResponse(token));
                     } else {
                         return Mono.error(new BadCredentialsException("Invalid username or password"));

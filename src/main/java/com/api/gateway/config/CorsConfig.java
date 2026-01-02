@@ -1,5 +1,8 @@
 package com.api.gateway.config;
 
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -8,15 +11,20 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
+@Data
+@Slf4j
 @Configuration
+@ConfigurationProperties(prefix = "cors")
 public class CorsConfig {
+
+    private List<String> allowedOrigins;
 
     // ⭐ CORS BEAN FOR WEB FLUX — REQUIRED
     @Bean
     public CorsWebFilter corsWebFilter() {
+        log.info("Applying CORS configuration with allowed origins: {}", allowedOrigins);
         CorsConfiguration config = new CorsConfiguration();
-        // ✅ FRONTEND ORIGINS ONLY (no paths, no trailing slash)
-        config.setAllowedOriginPatterns(List.of("http://localhost:4200", "https://sach-cp.github.io"));
+        config.setAllowedOrigins(allowedOrigins);
         config.setAllowedMethods(List.of( "GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setExposedHeaders(List.of("Authorization"));

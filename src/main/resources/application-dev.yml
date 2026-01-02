@@ -1,26 +1,24 @@
 spring:
   application:
     name: gateway
-
   data:
     mongodb:
       uri: ${MONGO_URI}
-
   cloud:
     gateway:
-      default-filters:
-        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
-
       routes:
-        - id: hotel-service
-          uri: http://localhost:8081
+        - id: hotel_management
+          uri: https://hotel-management-doxv.onrender.com
           predicates:
-            - Path=/api/v1/hotels/**
+            - Path=/api/v1/**
 
-        - id: booking-service
-          uri: http://localhost:8082
-          predicates:
-            - Path=/api/v1/bookings/**
+#        - id: booking-service
+#          uri: http://localhost:8082
+#          predicates:
+#            - Path=/api/v1/bookings/**
 
-server:
-  port: ${PORT:8080}
+# CORS Configs
+cors:
+  allowed-origins:
+    - http://localhost:4200
+    - https://sach-cp.github.io
